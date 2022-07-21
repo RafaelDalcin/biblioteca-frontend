@@ -5,19 +5,32 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-btn
-            outlined
+          <v-btn  
+            elevation="3"
+            outlined  
             @click="getUsuarios"
+            color="primary"
           >
             Pesquisar
-          </v-btn>
+            <v-icon 
+              style="margin-left:8%">
+              mdi-account-search
+            </v-icon>
+          </v-btn>  
         </v-col>
         <v-col>
           <v-btn
+            style="margin-left:-75%"
+            elevation="3"
             outlined
             to="/usuarios/cadastro"
+            color="green"
           >
             Cadastrar
+              <v-icon 
+              style="margin-left:8%">
+              mdi-account-plus
+            </v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -28,7 +41,23 @@
         :items="usuarios"
         :items-per-page="10"
         class="elevation-1"
-      ></v-data-table>
+      >
+      <template v-slot:item.actions="{ item }">
+        <v-icon
+          small
+          class="mr-2"
+          @click="editItem(item)"
+        >
+          mdi-pencil
+        </v-icon>
+        <v-icon
+          small
+          @click="deletarItem(item)"
+        >
+          mdi-delete
+        </v-icon>
+      </template>
+      </v-data-table>
     </v-container>
   </v-container>
 </template>
@@ -69,6 +98,7 @@ export default {
           sortable: false, //se permite ordenação dos dados por essa coluna
           value: 'telefone', //é o dado que essa coluna vai receber
         },
+        { text: "", value: "actions" }
 
       ],
       usuarios: []
@@ -79,7 +109,18 @@ export default {
   },
   methods: {
     async getUsuarios () {
-      this.usuarios = await this.$axios.$get('http://localhost:3333/usuarios/');
+      this.usuarios = await this.$axios.$get('http://localhost:3333/usuarios');
+    },
+    async deletar (usuario) {
+      try {
+        if (confirm(`Deseja deletar o usuário id ${usuario.id} - ${usuario.nome}?`)) {
+          let response = await this.$axios.$post('http://localhost:3333/usuarios/deletar', { id: usuario.id });
+          this.$toast.success(response.message)
+          this.getUsuarios();
+        }
+      } catch (error) {
+        this.$toast.error('Ocorreu um erro ao atender a requisição. Contate o administrador do sistema.')
+      }
     }
   }
 }

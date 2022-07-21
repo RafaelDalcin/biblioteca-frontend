@@ -5,19 +5,32 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-btn
-            outlined
+           <v-btn  
+            elevation="3"
+            outlined  
             @click="getLivros"
+            color="primary"
           >
             Pesquisar
-          </v-btn>
+            <v-icon 
+              style="margin-left:8%">
+              mdi-magnify
+            </v-icon>
+          </v-btn>  
         </v-col>
         <v-col>
           <v-btn
+            style="margin-left:-75%"
+            elevation="3"
             outlined
             to="/livros/cadastro"
+            color="green"
           >
             Cadastrar
+              <v-icon 
+              style="margin-left:8%">
+              mdi-plus-circle
+            </v-icon>
           </v-btn>
         </v-col>
       </v-row>
@@ -28,7 +41,23 @@
         :items="livros"
         :items-per-page="10"
         class="elevation-1"
-      ></v-data-table>
+      >
+      <template v-slot:item.actions="{ item }">
+        <v-icon
+          small
+          class="mr-2"
+          @click="editItem(item)"
+        >
+          mdi-pencil
+        </v-icon>
+        <v-icon
+          small
+          @click="deletarItem(item)"
+        >
+          mdi-delete
+        </v-icon>
+      </template>
+      </v-data-table>
     </v-container>
   </v-container>
 </template>
@@ -52,10 +81,10 @@ export default {
           value: 'titulo',
         },
         {
-          text: 'Sinopse', //nome da coluna
+          text: 'Autor', //nome da coluna
           align: 'center', //alinhamento -center, end, start
           sortable: false, //se permite ordenação dos dados por essa coluna
-          value: 'sinopse', //é o dado que essa coluna vai receber
+          value: 'autor.nome', //é o dado que essa coluna vai receber
         },
         {
           text: 'Categoria', //nome da coluna
@@ -63,13 +92,7 @@ export default {
           sortable: false, //se permite ordenação dos dados por essa coluna
           value: 'categoria.nome', //é o dado que essa coluna vai receber
         },
-        {
-          text: 'Autor', //nome da coluna
-          align: 'center', //alinhamento -center, end, start
-          sortable: false, //se permite ordenação dos dados por essa coluna
-          value: 'autor.nome', //é o dado que essa coluna vai receber
-        },
-
+        { text: "", value: "actions" },
       ],
       livros: []
     }
@@ -79,7 +102,18 @@ export default {
   },
   methods: {
     async getLivros () {
-      this.livros = await this.$axios.$get('http://localhost:3333/livros/');
+      this.livros = await this.$axios.$get('http://localhost:3333/livros');
+    },
+    async deletarItem (livro) {
+      try {
+        if (confirm(`Deseja deletar o livro id ${livro.id} - ${livro.nome}?`)) {
+          let response = await this.$axios.$post('http://localhost:3333/livros/deletar', { id: livro.id });
+          this.$toast.success(response.message)
+          this.getLivros();
+        }
+      } catch (error) {
+        this.$toast.error('Ocorreu um erro ao atender a requisição. Contate o administrador do sistema.')
+      }
     }
   }
 }

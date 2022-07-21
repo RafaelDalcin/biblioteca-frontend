@@ -57,9 +57,7 @@
             />
           </v-col>
         </v-row>
-      </v-container>
-    </v-form>
-    <v-btn
+            <v-btn
       outlined
       to="/usuarios"
     >
@@ -71,6 +69,8 @@
     >
       Cadastrar
     </v-btn>
+      </v-container>
+    </v-form>
   </v-container>
 </template>
 

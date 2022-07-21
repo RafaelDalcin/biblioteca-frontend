@@ -55,7 +55,7 @@
         @click.stop="rightDrawer = !rightDrawer"
       >
         <v-icon>mdi-menu</v-icon>
-      </v-btn>
+      </v-btn>  
     </v-app-bar>
     <v-main>
       <v-container>
@@ -103,7 +103,7 @@ export default {
           to: '/'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-bookshelf',
           title: 'Livros',
           to: '/livros'
         },
@@ -113,12 +113,12 @@ export default {
           to: '/categorias'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-badge-account',
           title: 'Autores',
           to: '/autores'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-account',
           title: 'Usuários',
           to: '/usuarios'
         }
