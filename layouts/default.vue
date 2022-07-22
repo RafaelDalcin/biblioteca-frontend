@@ -8,7 +8,7 @@
       app
     >
       <v-list>
-        <v-list-item
+        <v-list-item 
           v-for="(item, i) in items"
           :key="i"
           :to="item.to"
@@ -121,7 +121,14 @@ export default {
           icon: 'mdi-account',
           title: 'Usuários',
           to: '/usuarios'
-        }
+        },
+        {
+          icon: 'mdi-account',
+          title: 'Livros Emprestados',
+          to: '/consulta'
+        },
+        
+        
       ],
       miniVariant: false,
       right: true,

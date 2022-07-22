@@ -2,7 +2,7 @@
   <v-container>
     <h1>Cadastro de Livros</h1>
     <hr>
-    <v-form>
+    <v-form v-model="valid">
       <v-container>
         <v-row>
           <v-col
@@ -24,6 +24,8 @@
               placeholder="Titulo"
               label="Titulo"
               outlined
+              :rules="rule"
+              required
             >
             </v-text-field>
           </v-col>
@@ -49,6 +51,8 @@
               label="Autor"
               item-text="nome"
               item-value="id"
+              :rules="rule"
+              required
             ></v-autocomplete>
           </v-col>
           <v-col
@@ -61,6 +65,8 @@
               label="Categoria"
               item-text="nome"
               item-value="id"
+              :rules="rule"
+              required
             ></v-autocomplete>
           </v-col>
         </v-row>
@@ -72,9 +78,9 @@
         </v-btn>
         <v-btn
           outlined
-          @click="cadastrar"
+          @click="persistir"
         >
-          Cadastrar
+          Salvar
         </v-btn>
       </v-container>
     </v-form>
@@ -86,6 +92,7 @@ export default {
   name: 'CadastroLivrosPage',
   data () {
     return {
+      valid: false,
       livro: {
         id: null,
         titulo: null,
@@ -94,29 +101,56 @@ export default {
         idAutor: null
       },
       categorias: [],
-      autores: []
+      autores: [],
+      rule: [
+        v => !!v || 'Esse campo é obrigatório'
+      ]
     }
   },
   created () {
+    if (this.$route?.params?.id) {
+    this.getById(this.$route.params.id)
+    }
     this.getAutores();
     this.getCategorias();
   },
   methods: {
-    async cadastrar () {
-      let livro = {
-        titulo: this.livro.titulo,
-        sinopse: this.livro.sinopse,
-        idCategoria: this.livro.idCategoria,
-        idAutor: this.livro.idAutor
+    async persistir () {
+      try {
+        if (!this.valid) {
+        return this.$toast.warning('O formulário de cadastro não é válido!');
+        }
+        let livro = {
+          titulo: this.livro.titulo,
+          sinopse: this.livro.sinopse,
+          idCategoria: this.livro.idCategoria,
+          idAutor: this.livro.idAutor
       };
-      let response = await this.$axios.$post('http://localhost:3333/livros', livro);
-      console.log(response);
+              //caso não tenha ID na tela, significa que é um cadastro NOVO
+        //por isso ele vai apenas com o objeto da categoria para o cadastro
+        //como no final tem um RETURN, ele vai cair fora da função PERSISTIR
+      if (!this.livro.id) {
+        await this.$axios.$post('http://localhost:3333/livros', livro);
+        this.$toast.success('Cadastro realizado com sucesso!');
+        return this.$router.push('/livros');
+      }
+
+        await this.$axios.$post(`http://localhost:3333/livros/${this.livro.id}`, livro);
+        this.$toast.success('Cadastro atualizado com sucesso!');
+        return this.$router.push('/livros');
+        
+      } catch (error) {
+        this.$toast.error('Ocorreu um erro ao realizar o cadastro!');
+      }
     },
     async getAutores () {
       this.autores = await this.$axios.$get('http://localhost:3333/autores');
     },
     async getCategorias () {
       this.categorias = await this.$axios.$get('http://localhost:3333/categorias');
+    },
+    async getById (id) {
+      this.livro = await this.$axios.$get(`http://localhost:3333/livros/${id}`);
     }
   }
 }

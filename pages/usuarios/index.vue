@@ -46,7 +46,7 @@
         <v-icon
           small
           class="mr-2"
-          @click="editItem(item)"
+          @click="editarItem(item)"
         >
           mdi-pencil
         </v-icon>
@@ -121,7 +121,13 @@ export default {
       } catch (error) {
         this.$toast.error('Ocorreu um erro ao atender a requisição. Contate o administrador do sistema.')
       }
+    },
+    async editarItem (usuario) {
+      this.$router.push({
+        name: 'usuarios-cadastro',
+        params: { id: usuario.id }
+        });
     }
   }
-}
+} 
 </script>

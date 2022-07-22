@@ -5,7 +5,8 @@
     <v-container>
            <v-row>
         <v-col>
-           <v-btn  
+           <v-btn 
+            style="margin-right: 0px"
             elevation="3"
             outlined  
             @click="getAutores"
@@ -21,7 +22,7 @@
         </v-col>
         <v-col>
           <v-btn
-            style="margin-left:-75%"
+            style="margin-left: -75%"
             elevation="3"
             outlined
             to="/autores/cadastro"
@@ -38,6 +39,7 @@
     </v-container>
     <v-container>
       <v-data-table
+        style="border-radius: 1%; border-style: ;"
         :headers="headers"
         :items="autores"
         :items-per-page="10"
@@ -45,14 +47,16 @@
       >
     <template v-slot:item.actions="{ item }">
       <v-icon
-        small
+        color="blue"
+        medium
         class="mr-2"
-        @click="editItem(item)"
+        @click="editarItem(item)"
         >
         mdi-pencil
       </v-icon>
       <v-icon
-        small
+        color="red"
+        medium
         @click="deletarItem(item)"
         >
         mdi-delete
@@ -109,7 +113,13 @@ export default {
       } catch (error) {
         this.$toast.error('Ocorreu um erro ao atender a requisição. Contate o administrador do sistema.')
       }
-    }
-  }
-}
+    },
+      async editarItem (autor) {
+            this.$router.push({
+              name: 'autores-cadastro',
+              params: { id: autor.id }
+            });
+          }
+        }
+      } 
 </script>

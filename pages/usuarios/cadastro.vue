@@ -2,7 +2,7 @@
   <v-container>
     <h1>Cadastro de Usuários</h1>
     <hr>
-    <v-form>
+    <v-form v-model="valid">
       <v-container>
         <v-row>
           <v-col
@@ -24,6 +24,8 @@
               placeholder="Nome"
               label="Nome"
               outlined
+              required
+              :rules="rule"
             />
           </v-col>
         </v-row>
@@ -34,6 +36,8 @@
               placeholder="CPF/CNPJ"
               label="CPF/CNPJ"
               outlined
+              required
+              :rules="rule"
             />
           </v-col>
         </v-row>
@@ -44,6 +48,8 @@
               placeholder="E-mail"
               label="E-mail"
               outlined
+              required
+              :rules="rule"
             />
           </v-col>
         </v-row>
@@ -54,6 +60,8 @@
               placeholder="Telefone"
               label="Telefone"
               outlined
+              required
+              :rules="rule"
             />
           </v-col>
         </v-row>
@@ -65,9 +73,9 @@
     </v-btn>
     <v-btn
       outlined
-      @click="cadastrar"
+      @click="persistir"
     >
-      Cadastrar
+      Salvar
     </v-btn>
       </v-container>
     </v-form>
@@ -79,25 +87,54 @@ export default {
   name: 'CadastroUsuariosPage',
   data () {
     return {
+      valid: false,
       usuario: {
         id: null,
         nome: null,
         cpfcnpj: null,
         email: null,
         telefone: null,
-      }
+      },
+      rule: [
+        v => !!v || 'Esse campo é obrigatório'
+      ]
     }
   },
+
+    created () {
+    if (this.$route?.params?.id) {
+      this.getById(this.$route.params.id)
+    }
+  },
+
   methods: {
-    async cadastrar () {
-      let usuario = {
+    async persistir () {
+      try {
+        if (!this.valid) {
+        return this.$toast.warning('O formulário de cadastro não é válido!');
+        }
+        let usuario = {
         nome: this.usuario.nome,
         cpfcnpj: this.usuario.cpfcnpj,
         email: this.usuario.email,
         telefone: this.usuario.telefone
       };
-      let response = await this.$axios.$post('http://localhost:3333/usuarios', usuario);
-      console.log(response);
+
+      if (!this.usuario.id) {
+          await this.$axios.$post('http://localhost:3333/usuarios', usuario);
+          this.$toast.success('Cadastro realizado com sucesso!');
+          return this.$router.push('/usuarios');
+      }
+        await this.$axios.$post(`http://localhost:3333/usuarios/${this.usuario.id}`, usuario);
+        this.$toast.success('Cadastro atualizado com sucesso!');
+        return this.$router.push('/usuarios');
+
+      } catch (error) {
+        this.$toast.error('Ocorreu um erro ao realizar o cadastro!');
+      }
+    },
+    async getById (id) {
+      this.usuario = await this.$axios.$get(`http://localhost:3333/usuarios/${id}`);
     }
   }
 }

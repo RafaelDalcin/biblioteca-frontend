@@ -53,9 +53,9 @@
     </v-btn>
     <v-btn
       outlined
-      @click="cadastrar"
+      @click="persistir"
     >
-      Cadastrar
+      Salvar
     </v-btn>
   </v-container>
 </template>
@@ -76,8 +76,15 @@ export default {
       ]
     }
   },
+
+  created () {
+    if (this.$route?.params?.id) {
+      this.getById(this.$route.params.id)
+    }
+  },
+  
   methods: {
-    async cadastrar () {
+    async persistir () {
       try {
         if (!this.valid) {
         return this.$toast.warning('O formulário de cadastro não é válido!');
@@ -86,13 +93,25 @@ export default {
           nome: this.autor.nome,
           email: this.autor.email,
         };
-        await this.$axios.$post('http://localhost:3333/autores', autor);
-        this.$toast.success('Cadastro realizado com sucesso');
-        this.$router.push('/autores');
+        //caso não tenha ID na tela, significa que é um cadastro NOVO
+        //por isso ele vai apenas com o objeto da categoria para o cadastro
+        //como no final tem um RETURN, ele vai cair fora da função PERSISTIR
+
+        if (!this.autor.id) {
+          await this.$axios.$post('http://localhost:3333/autores', autor);
+          this.$toast.success('Cadastro realizado com sucesso!');
+          return this.$router.push('/autores');
+        }
+        await this.$axios.$post(`http://localhost:3333/autores/${this.autor.id}`, autor);
+        this.$toast.success('Cadastro atualizado com sucesso!');
+        return this.$router.push('/autores');
 
       } catch (error) {
         this.$toast.error('Ocorreu um erro ao realizar o cadastro!');
       }
+    },
+     async getById (id) {
+      this.autor = await this.$axios.$get(`http://localhost:3333/autores/${id}`);
     }
   }
 }
