@@ -127,7 +127,11 @@ export default {
           title: 'Livros Emprestados',
           to: '/consulta'
         },
-        
+        {
+          icon: 'mdi-calculator',
+          title: 'Carculadora',
+          to: '/carculadora'
+        },
         
       ],
       miniVariant: false,
