@@ -1,0 +1,129 @@
+<template>
+  <v-container>
+    <h1>Consulta de Emprestimos</h1>
+    <hr>
+    <v-container>
+      <v-row>
+        <v-col>
+           <v-btn  
+            elevation="3"
+            outlined  
+            @click="getEmprestimos"
+            color="primary"
+          >
+            Pesquisar
+            <v-icon 
+              style="margin-left:8%">
+              mdi-magnify
+            </v-icon>
+          </v-btn>  
+        </v-col>
+        <v-col>
+          <v-btn
+            style="margin-left:-75%"
+            elevation="3"
+            outlined
+            to="/emprestimos/cadastro"
+            color="green"
+          >
+            Cadastrar
+              <v-icon 
+              style="margin-left:8%">
+              mdi-plus-circle
+            </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-container>
+      <v-data-table
+        :headers="headers"
+        :items="emprestimos"
+        :items-per-page="10"
+        class="elevation-1"
+      >
+      <template v-slot:item.actions="{ item }">
+          <v-icon
+            color="blue"
+            medium
+            class="mr-2"
+            @click="editarItem(item)"
+            >
+            mdi-pencil
+          </v-icon>
+          <v-icon
+            color="red"
+            medium
+            @click="deletarItem(item)"
+            >
+            mdi-delete
+          </v-icon>
+        </template>
+      </v-data-table>
+    </v-container>
+  </v-container>
+</template>
+
+<script>
+export default {
+  name: 'ConsultaEmprestimosPage',
+  data () {
+    return {
+      headers: [
+        {
+          text: 'Código', //nome da coluna
+          align: 'center', //alinhamento -center, end, start
+          sortable: false, //se permite ordenação dos dados por essa coluna
+          value: 'id', //é o dado que essa coluna vai receber
+        },
+        {
+          text: 'Titulo',
+          align: 'center',
+          sortable: false,
+          value: 'prazo',
+        },
+        {
+          text: 'Autor', //nome da coluna
+          align: 'center', //alinhamento -center, end, start
+          sortable: false, //se permite ordenação dos dados por essa coluna
+          value: 'devolucao', //é o dado que essa coluna vai receber
+        },
+        {
+          text: 'Categoria', //nome da coluna
+          align: 'center', //alinhamento -center, end, start
+          sortable: false, //se permite ordenação dos dados por essa coluna
+          value: 'categoria.nome', //é o dado que essa coluna vai receber
+        },
+        { text: "", value: "actions" },
+      ],
+      livros: []
+    }
+  },
+  created () {
+    this.getLivros()
+  },
+  methods: {
+    async getLivros () {
+      this.livros = await this.$axios.$get('http://localhost:3333/livros');
+    },
+    async deletarItem (livro) {
+      try {
+        if (confirm(`Deseja deletar o livro id ${livro.id} - ${livro.nome}?`)) {
+          let response = await this.$axios.$post('http://localhost:3333/livros/deletar', { id: livro.id });
+          this.$toast.success(response.message)
+          this.getLivros();
+        }
+      } catch (error) {
+        this.$toast.error('Ocorreu um erro ao atender a requisição. Contate o administrador do sistema.')
+      }
+    },
+
+    async editarItem (livro) {
+      this.$router.push({
+        name: 'livros-cadastro',
+        params: { id: livro.id }
+        });
+    }
+  }
+} 
+</script>

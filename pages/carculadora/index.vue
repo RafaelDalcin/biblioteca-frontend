@@ -140,7 +140,7 @@ export default {
       valor1: null,
       valor2: null,
       conta: [],
-      numbers: ['1', '2', '3' ,'4' ,'5' ,'6' ,'7' ,'8' , '9', '0'],
+      numeros: ['1', '2', '3' ,'4' ,'5' ,'6' ,'7' ,'8' , '9', '0'],
       operacoes: ['+', '-', '*', '/'],
     }
   },
@@ -160,14 +160,6 @@ export default {
         console.log(this.valor1);
         this.valorAtual = null  
         this.visor = [null]
-
-        if (this.valor1) {
-        this.operador = value
-        this.valor2 = this.valorAtual
-        console.log(this.valor2);
-        this.valorAtual = null
-        this.visor = [null]
-      }
       }
       
     }
