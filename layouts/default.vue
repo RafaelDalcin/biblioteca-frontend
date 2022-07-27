@@ -122,6 +122,12 @@ export default {
           title: 'Usuários',
           to: '/usuarios'
         },
+        { 
+          icon: 'mdi-account',
+          title: 'Empréstimos',
+          to: '/emprestimos'
+        },
+        
         {
           icon: 'mdi-account',
           title: 'Livros Emprestados',

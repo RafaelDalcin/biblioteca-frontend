@@ -58,6 +58,13 @@
             >
             mdi-delete
           </v-icon>
+          <v-icon
+            color="red"
+            medium
+            @click="encerrarEmprestimo(item)"
+            >
+            mdi-sword
+          </v-icon>
         </template>
       </v-data-table>
     </v-container>
@@ -77,51 +84,80 @@ export default {
           value: 'id', //é o dado que essa coluna vai receber
         },
         {
-          text: 'Titulo',
+          text: 'Prazo',
           align: 'center',
           sortable: false,
           value: 'prazo',
         },
         {
-          text: 'Autor', //nome da coluna
-          align: 'center', //alinhamento -center, end, start
-          sortable: false, //se permite ordenação dos dados por essa coluna
-          value: 'devolucao', //é o dado que essa coluna vai receber
+          text: 'Devolução',
+          align: 'center',
+          sortable: false,
+          value: 'devolucao',
         },
         {
-          text: 'Categoria', //nome da coluna
+          text: 'Data do Empréstimo',
+          align: 'center',
+          sortable: false,
+          value: 'created_at',
+        },
+        {
+          text: 'Livros', //nome da coluna
           align: 'center', //alinhamento -center, end, start
           sortable: false, //se permite ordenação dos dados por essa coluna
-          value: 'categoria.nome', //é o dado que essa coluna vai receber
+          value: 'titulo', //é o dado que essa coluna vai receber
         },
         { text: "", value: "actions" },
       ],
+      emprestimos: [],
       livros: []
     }
   },
   created () {
-    this.getLivros()
+    this.getEmprestimos();
+    this.getLivros();
   },
   methods: {
     async getLivros () {
       this.livros = await this.$axios.$get('http://localhost:3333/livros');
     },
-    async deletarItem (livro) {
+    async getEmprestimos () {
+      this.emprestimos = await this.$axios.$get('http://localhost:3333/emprestimos');
+      this.emprestimos.forEach((emprestimo) => {
+        let ano = emprestimo.created_at.substring(0, 4);
+        let mes = emprestimo.created_at.substring(5, 7);
+        let dia = emprestimo.created_at.substring(8, 10);
+        emprestimo.created_at = `${ano}-${mes}-${dia}`
+      });
+    },
+    async deletarItem (emprestimo) {
       try {
-        if (confirm(`Deseja deletar o livro id ${livro.id} - ${livro.nome}?`)) {
-          let response = await this.$axios.$post('http://localhost:3333/livros/deletar', { id: livro.id });
+        if (confirm(`Deseja deletar o emprestimo id ${emprestimo.id}?`)) {
+          let response = await this.$axios.$post('http://localhost:3333/emprestimos/deletar', { id: emprestimo.id });
           this.$toast.success(response.message)
-          this.getLivros();
+          this.getEmprestimos();
+          console.log('chegou');
+        }
+      } catch (error) {
+        this.$toast.error('Ocorreu um erro ao atender a requisição. Contate o administrador do sistema.')
+      }
+    },
+        async encerrarEmprestimo (emprestimo) {
+      try {
+        if (confirm(`Deseja encerrar o emprestimo id ${emprestimo.id}?`)) {
+          let response = await this.$axios.$post(`http://localhost:3333/emprestimos/${emprestimo.id}`, {devolucao:  new Date(Date.now()).toISOString().substring(0,10)});
+          this.$toast.success(response.message)
+          this.getEmprestimos();
         }
       } catch (error) {
         this.$toast.error('Ocorreu um erro ao atender a requisição. Contate o administrador do sistema.')
       }
     },
 
-    async editarItem (livro) {
+    async editarItem(emprestimo) {
       this.$router.push({
-        name: 'livros-cadastro',
-        params: { id: livro.id }
+        name: 'emprestimos-cadastro',
+        params: { id: emprestimo.id }
         });
     }
   }
